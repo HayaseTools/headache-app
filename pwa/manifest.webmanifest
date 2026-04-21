@@ -1,0 +1,22 @@
+{
+  "name": "頭痛ログ（MigraLog）",
+  "short_name": "MigraLog",
+  "description": "頭痛記録・気象相関・ローカルAI予測を端末内だけで実行するPWA",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0f172a",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "../assets/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "../assets/favicon.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    }
+  ]
+}

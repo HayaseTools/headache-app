@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta
+      name="description"
+      content="頭痛ログ（MigraLog）- 頭痛記録、天気相関、ローカルAI予測を1つにまとめたプライバシー重視のPWA"
+    />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="../assets/favicon.png" />
+    <title>頭痛ログ（MigraLog）</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <header class="app-header">
+      <div class="title-wrap">
+        <p class="logo-chip">MIGRALOG</p>
+        <h1 class="main-title">
+          <span>頭痛</span>
+          <span class="title-accent">ログ</span>
+        </h1>
+        <p class="subtitle">ローカル保存 x 天気相関 x ローカルAI予測</p>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" type="button">テーマ切替</button>
+        <button id="installBtn" type="button" hidden>インストール</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="screen active" data-tab="record">
+        <div class="hero-card">
+          <p class="eyebrow">Daily Check-in</p>
+          <h2>痛みを記録して、傾向を見える化</h2>
+          <p>
+            その日の体調を丁寧に残し、気象・生活リズム・服薬履歴を一つの流れで把握できます。
+            後から振り返ったときに「なぜ起きたか」を考えやすい記録体験を目指しています。
+          </p>
+        </div>
+
+        <section class="card">
+          <h3>頭痛記録</h3>
+          <form id="entryForm">
+            <div class="grid record-grid">
+              <label>日時<input type="datetime-local" id="datetime" class="datetime-input" /></label>
+              <label>
+                痛みの強さ (1-10)
+                <input type="range" id="intensity" min="1" max="10" value="5" />
+                <span id="intensityPreview" class="intensity-pill">5</span>
+              </label>
+              <fieldset class="location-choice-group">
+                <legend>痛みの部位</legend>
+                <div class="location-options-row">
+                  <label class="choice-chip"><input type="radio" name="location" value="left" checked /><span>左</span></label>
+                  <label class="choice-chip"><input type="radio" name="location" value="right" /><span>右</span></label>
+                  <label class="choice-chip"><input type="radio" name="location" value="both" /><span>両側</span></label>
+                  <label class="choice-chip"><input type="radio" name="location" value="back" /><span>後頭部</span></label>
+                </div>
+              </fieldset>
+              <div class="medicine-field">
+                <label for="medicineName">薬名入力</label>
+                <input type="text" id="medicineName" class="standard-input" list="medicineSuggestions" placeholder="例: イブプロフェン" />
+                <datalist id="medicineSuggestions">
+                  <option value="イブプロフェン"></option>
+                  <option value="ロキソプロフェン"></option>
+                  <option value="アセトアミノフェン"></option>
+                  <option value="ロキソニン"></option>
+                  <option value="カロナール"></option>
+                  <option value="タイレノール"></option>
+                  <option value="スマトリプタン"></option>
+                  <option value="ゾルミトリプタン"></option>
+                  <option value="エレトリプタン"></option>
+                  <option value="リザトリプタン"></option>
+                  <option value="ナラトリプタン"></option>
+                  <option value="フロバトリプタン"></option>
+                  <option value="ナプロキセン"></option>
+                  <option value="ジクロフェナク"></option>
+                  <option value="セレコキシブ"></option>
+                  <option value="インドメタシン"></option>
+                  <option value="エルゴタミン"></option>
+                  <option value="デパケン"></option>
+                  <option value="トピラマート"></option>
+                  <option value="プレドニゾロン"></option>
+                  <option value="葛根湯"></option>
+                  <option value="五苓散"></option>
+                  <option value="呉茱萸湯"></option>
+                  <option value="釣藤散"></option>
+                  <option value="半夏白朮天麻湯"></option>
+                </datalist>
+                <div class="medicine-inline-actions">
+                  <button type="button" id="toggleMedicineFavoriteBtn" class="secondary-action">入力中の薬をお気に入り切替</button>
+                  <button type="button" id="clearMedicineBtn" class="secondary-action">薬名クリア</button>
+                </div>
+                <details id="medicinePickerPanel" class="medicine-picker-panel">
+                  <summary>薬を候補から選ぶ（タップで開く）</summary>
+                  <p class="tiny-help muted">使い方: 薬名チップで選択、右の★でお気に入り登録/解除できます。選択後は自動で閉じます。</p>
+                  <div id="medicineQuickPick" class="medicine-quick-pick"></div>
+                </details>
+              </div>
+              <label>服用時刻<input type="time" id="medicineTime" class="standard-input" /></label>
+              <label>
+                睡眠時間（任意）
+                <select id="sleepHours">
+                  <option value="">未入力</option>
+                  <option value="0">0.0時間</option>
+                  <option value="0.5">0.5時間</option>
+                  <option value="1">1.0時間</option>
+                  <option value="1.5">1.5時間</option>
+                  <option value="2">2.0時間</option>
+                  <option value="2.5">2.5時間</option>
+                  <option value="3">3.0時間</option>
+                  <option value="3.5">3.5時間</option>
+                  <option value="4">4.0時間</option>
+                  <option value="4.5">4.5時間</option>
+                  <option value="5">5.0時間</option>
+                  <option value="5.5">5.5時間</option>
+                  <option value="6">6.0時間</option>
+                  <option value="6.5">6.5時間</option>
+                  <option value="7">7.0時間</option>
+                  <option value="7.5">7.5時間</option>
+                  <option value="8">8.0時間</option>
+                  <option value="8.5">8.5時間</option>
+                  <option value="9">9.0時間</option>
+                  <option value="9.5">9.5時間</option>
+                  <option value="10">10.0時間</option>
+                  <option value="10.5">10.5時間</option>
+                  <option value="11">11.0時間</option>
+                  <option value="11.5">11.5時間</option>
+                  <option value="12">12.0時間</option>
+                  <option value="12.5">12.5時間</option>
+                  <option value="13">13.0時間</option>
+                  <option value="13.5">13.5時間</option>
+                  <option value="14">14.0時間</option>
+                </select>
+              </label>
+              <label>
+                飲酒量（任意）
+                <select id="alcoholIntake">
+                  <option value="">未入力</option>
+                  <option value="0">0杯</option>
+                  <option value="0.5">0.5杯</option>
+                  <option value="1">1杯</option>
+                  <option value="2">2杯</option>
+                  <option value="3">3杯</option>
+                  <option value="4">4杯</option>
+                  <option value="5">5杯以上</option>
+                </select>
+              </label>
+            </div>
+            <label>メモ<textarea id="memo" rows="3" placeholder="自由記述"></textarea></label>
+            <div class="actions record-primary-actions">
+              <button type="submit">記録を保存</button>
+              <button type="button" id="fillWeatherBtn">天気を補完</button>
+              <button type="button" id="backupBtn">バックアップファイル作成</button>
+            </div>
+            <label class="restore-row">復元 <input type="file" id="restoreInput" accept=".migralog,application/json,.json" /></label>
+            <dl id="recordActionHelp" class="help-grid tiny-help">
+              <dt>記録を保存</dt><dd>入力内容を保存し、一覧とグラフを更新します。</dd>
+              <dt>バックアップファイル作成</dt><dd>端末移行・機種変更時に引き継ぐための保存ファイルを作成します。</dd>
+              <dt>復元</dt><dd>保存済みファイルを読み込み、画面へ反映します。</dd>
+            </dl>
+          </form>
+        </section>
+
+        <section class="card">
+          <h3>記録一覧</h3>
+          <div id="entriesList"></div>
+        </section>
+
+        <section class="card help-card">
+          <h3>このタブの使い方</h3>
+          <p class="muted">
+            体調が変わったタイミングで「日時・痛み・薬・生活情報」を記録します。できる範囲で続けるだけでも、あとで傾向が見えやすくなります。
+          </p>
+        </section>
+
+        <section class="card ad-slot">
+          <p class="ad-label">広告枠 A</p>
+          <div class="ad-box" id="adRecordInline">将来の広告コード挿入エリア</div>
+        </section>
+      </section>
+
+      <section class="screen" data-tab="analysis">
+        <section class="card">
+          <h3>天気との相関分析</h3>
+          <p class="muted">記録時の気象データから相関係数を表示します。</p>
+          <p id="weatherDataHint" class="muted tiny-help"></p>
+          <canvas id="weatherCorrelationChart"></canvas>
+          <canvas id="intensityTrendChart"></canvas>
+        </section>
+
+        <section class="card help-card">
+          <h3>このタブの使い方</h3>
+          <p class="muted">
+            棒グラフは「気象と頭痛の関係」を見ます。数字が高いほど関係が強い可能性があります。まずは1か月分ほど記録してから見るのがおすすめです。
+          </p>
+        </section>
+
+        <section class="card ad-slot">
+          <p class="ad-label">広告枠 B</p>
+          <div class="ad-box" id="adAnalysisInline">将来の広告コード挿入エリア</div>
+        </section>
+      </section>
+
+      <section class="screen" data-tab="ai">
+        <section class="card">
+          <h3>ローカルAI予測</h3>
+          <p class="muted">記録データを端末内で学習し、傾向説明と翌日リスクをまとめて表示します。</p>
+          <div class="actions">
+            <button id="analyzeRiskBtn" type="button">学習して傾向分析</button>
+          </div>
+          <p id="mlStatus" class="status">未学習</p>
+          <p id="mlInsight" class="muted tiny-help"></p>
+          <dl class="help-grid tiny-help">
+            <dt>学習して傾向分析</dt><dd>学習・傾向説明・翌日リスク表示をまとめて実行します。</dd>
+          </dl>
+        </section>
+
+        <section class="card help-card">
+          <h3>このタブの使い方</h3>
+          <p class="muted">
+            「モデル学習」を押すと、記録から翌日のリスクを予測します。カレンダー連携は、予定として見返したいときに使います。
+          </p>
+        </section>
+      </section>
+
+      <section class="screen" data-tab="report">
+        <section class="card">
+          <h3>月次レポート</h3>
+          <div class="report-controls">
+            <label class="compact-field">対象年<select id="reportYear" class="month-select"></select></label>
+            <label class="compact-field">対象月<select id="reportMonthSelect" class="month-select"></select></label>
+            <button id="generateReportBtn" type="button">サマリー更新</button>
+          </div>
+          <pre id="monthlySummary" class="summary"></pre>
+          <button id="exportPdfBtn" type="button">PDFエクスポート</button>
+          <dl class="help-grid tiny-help">
+            <dt>サマリー更新</dt><dd>画面の集計結果を更新します。</dd>
+            <dt>PDFエクスポート</dt><dd>自分で振り返るための月次メモを保存します。</dd>
+          </dl>
+        </section>
+
+        <section class="card help-card">
+          <h3>このタブの使い方</h3>
+          <p class="muted">
+            対象月を選んでサマリーを更新し、必要に応じてPDFで保存します。自分の振り返りメモとして使えます。
+          </p>
+        </section>
+
+        <section class="card ad-slot">
+          <p class="ad-label">広告枠 C</p>
+          <div class="ad-box" id="adReportInline">将来の広告コード挿入エリア</div>
+        </section>
+      </section>
+
+      <section class="screen" data-tab="settings">
+        <section class="card">
+          <h3>天気取得の位置設定</h3>
+          <label>
+            位置情報の利用方式
+            <select id="locationMode" class="wide-control">
+              <option value="auto">端末の位置情報を許可して利用</option>
+              <option value="manual">都道府県と市区町村を選んで利用</option>
+              <option value="none">位置情報を使わない（天気相関なし）</option>
+            </select>
+          </label>
+          <div id="manualLocationFields" class="grid">
+            <label>
+              都道府県
+              <select id="prefecture"></select>
+            </label>
+            <label>
+              市区町村
+              <select id="city"></select>
+            </label>
+          </div>
+          <p id="locationSettingStatus" class="muted"></p>
+        </section>
+
+        <section class="card">
+          <h3>テーマ</h3>
+          <label>
+            カラーテーマ
+            <select id="themePreset" class="wide-control"></select>
+          </label>
+          <label>
+            背景パターン
+            <select id="backgroundPattern" class="wide-control">
+              <option value="none">なし</option>
+              <option value="grid">うっすらグリッド</option>
+              <option value="dots">うっすらドット</option>
+              <option value="waves">やわらかいウェーブ</option>
+              <option value="mesh">メッシュ</option>
+              <option value="diagonal">斜めライン</option>
+              <option value="cross">クロスライン</option>
+              <option value="rings">同心円</option>
+              <option value="sparkle">スパークル</option>
+              <option value="noise-soft">ソフトノイズ</option>
+              <option value="hex">ヘキサゴン</option>
+              <option value="plaid">プラッド</option>
+              <option value="topo">地形図</option>
+              <option value="mist">ミスト</option>
+              <option value="grain">グレイン</option>
+              <option value="sunray">サンレイ</option>
+              <option value="gradient-grid">グラデグリッド</option>
+              <option value="aurora">オーロラ</option>
+              <option value="bubbles">バブル</option>
+              <option value="petal">花びら</option>
+              <option value="fabric">織り目</option>
+              <option value="wave-lines">ウェーブライン</option>
+              <option value="lattice">ラティス</option>
+              <option value="soft-tiles">ソフトタイル</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="card">
+          <h3>使い方</h3>
+          <ol class="help-list">
+            <li>「記録」タブで頭痛ログを保存</li>
+            <li>「分析」タブで相関を確認</li>
+            <li>「AI」タブで学習して翌日リスクを予測</li>
+            <li>「レポート」タブでPDF出力して自分の振り返りに活用</li>
+          </ol>
+        </section>
+
+        <section class="card">
+          <h3>プライバシーポリシー</h3>
+          <p class="policy-text">
+            本アプリは、利用者の頭痛記録・補助記録・学習モデルを端末内に保存し、外部サーバーへ送信しません。
+            保存先はブラウザのローカルストレージであり、利用者自身の操作によってのみバックアップ・復元されます。
+          </p>
+          <p class="policy-text">
+            天気情報取得時は、Open-Meteo APIに対して緯度経度または手動入力地点に基づく検索情報のみを送信します。
+            氏名、メールアドレス、端末識別子など個人を直接特定できる情報は送信しません。
+          </p>
+          <p class="policy-text">
+            位置情報の利用は「自動取得」「手動入力」「利用しない」から選択でき、いつでも設定変更可能です。
+            利用者は自らの判断でデータを削除でき、本ポリシーは将来の機能追加時に更新される場合があります。
+          </p>
+        </section>
+
+        <section class="card help-card">
+          <h3>このタブの使い方</h3>
+          <p class="muted">
+            位置情報やテーマはここでいつでも変更できます。迷った場合は、まず「位置情報を使わない」から始めても問題ありません。
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <nav class="tab-bar">
+      <button class="tab-btn active" data-tab-target="record">記録</button>
+      <button class="tab-btn" data-tab-target="analysis">分析</button>
+      <button class="tab-btn" data-tab-target="ai">AI</button>
+      <button class="tab-btn" data-tab-target="report">レポート</button>
+      <button class="tab-btn" data-tab-target="settings">設定</button>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+      <div class="loading-panel">
+        <div class="spinner" aria-hidden="true"></div>
+        <p id="loadingText">処理中...</p>
+      </div>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

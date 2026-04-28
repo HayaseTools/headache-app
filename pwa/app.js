@@ -729,7 +729,7 @@ function renderEntries() {
     const card = document.createElement("article");
     card.className = "entry-card";
     card.innerHTML = `
-      <strong>${new Date(entry.datetime).toLocaleString("ja-JP")}</strong>
+      <strong>${formatDateTimeWithWeekday(entry.datetime)}</strong>
       <span class="intensity-pill">${entry.intensity}</span>
       <div class="entry-meta">部位: ${locationLabel(entry.location)} / 薬: ${entry.medicineName || "なし"} ${entry.medicineTime ? `(${entry.medicineTime})` : ""}</div>
       <div class="entry-meta">天気: ${weatherLabel(entry.weather?.weatherCode)} / 気圧: ${displayNum(entry.weather?.pressure, "hPa")} / 気温: ${displayNum(entry.weather?.temperature, "°C")} / 湿度: ${displayNum(entry.weather?.humidity, "%")}</div>
@@ -796,7 +796,7 @@ function drawCharts() {
   intensityTrendChart = new Chart(ctx2, {
     type: "line",
     data: {
-      labels: entries.map((e) => new Date(e.datetime).toLocaleDateString("ja-JP")).reverse(),
+      labels: entries.map((e) => formatDateWithWeekday(e.datetime)).reverse(),
       datasets: [{
         label: "頭痛強度トレンド",
         data: entries.map((e) => e.intensity).reverse(),
@@ -1065,6 +1065,30 @@ function toTimeLocal(date) {
   const hh = String(date.getHours()).padStart(2, "0");
   const mm = String(date.getMinutes()).padStart(2, "0");
   return `${hh}:${mm}`;
+}
+
+function formatDateWithWeekday(datetimeValue) {
+  const dt = new Date(datetimeValue);
+  if (Number.isNaN(dt.getTime())) return String(datetimeValue || "");
+  return new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(dt);
+}
+
+function formatDateTimeWithWeekday(datetimeValue) {
+  const dt = new Date(datetimeValue);
+  if (Number.isNaN(dt.getTime())) return String(datetimeValue || "");
+  return new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(dt);
 }
 
 function toggleTheme() {

@@ -830,7 +830,7 @@ canvas {
   }
 
   .tab-bar {
-    bottom: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
     width: 100%;
     border-radius: 18px 18px 0 0;
     border-left: none;

@@ -1,4 +1,4 @@
-const CACHE_NAME = "migralog-cache-v1";
+const CACHE_NAME = "migralog-cache-v2"
 const FILES_TO_CACHE = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest", "../assets/favicon.png"];
 
 self.addEventListener("install", (event) => {

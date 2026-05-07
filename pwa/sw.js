@@ -1,4 +1,4 @@
-const CACHE_NAME = "migralog-cache-v2"
+const CACHE_NAME = "migralog-cache-v2";
 const FILES_TO_CACHE = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest", "../assets/favicon.png"];
 
 self.addEventListener("install", (event) => {
@@ -15,5 +15,39 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+  const requestUrl = new URL(event.request.url);
+  const sameOrigin = requestUrl.origin === self.location.origin;
+  const isCoreAsset = sameOrigin && (
+    requestUrl.pathname.endsWith("/") ||
+    requestUrl.pathname.endsWith("/index.html") ||
+    requestUrl.pathname.endsWith("/app.js") ||
+    requestUrl.pathname.endsWith("/styles.css") ||
+    requestUrl.pathname.endsWith("/manifest.webmanifest")
+  );
+
+  // Core files should prefer network so deployments show up quickly.
+  if (isCoreAsset) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
+        if (!sameOrigin) return response;
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      });
+    })
+  );
 });

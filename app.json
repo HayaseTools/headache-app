@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "headache-app",
+    "name": "頭痛ログ",
     "slug": "headache-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,10 +10,14 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#121d2a"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hayasetools.headacheapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +29,32 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8914844189894814~1859062486",
+          "iosAppId": "ca-app-pub-8914844189894814~1859062486"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "07155b3a-995c-47e7-a87e-4cccb27a61ef"
+      }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8914844189894814~1859062486",
+    "ios_app_id": "ca-app-pub-8914844189894814~1859062486"
   }
 }

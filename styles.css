@@ -28,21 +28,28 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  min-height: 100%;
+  background-color: #121d2a;
+  overscroll-behavior: none;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
   font-family: "Segoe UI", "Noto Sans JP", sans-serif;
   color: var(--text);
+  background-color: #121d2a;
   background: radial-gradient(circle at 20% -10%, #4f83c8 0%, var(--bg) 46%, #121d2a 100%);
+  background-attachment: fixed;
 }
 
 body::before {
@@ -728,8 +735,7 @@ canvas {
 }
 
 .ad-slot {
-  border-style: dashed;
-  border-color: color-mix(in srgb, var(--accent), white 50%);
+  display: none;
 }
 
 .ad-label {
@@ -748,6 +754,11 @@ canvas {
   color: var(--muted);
   background: color-mix(in srgb, var(--card-solid), #ffffff 8%);
   font-size: 0.86rem;
+}
+
+.ad-box .adsbygoogle {
+  display: block;
+  width: 100%;
 }
 
 .toast {
